@@ -6,6 +6,8 @@ declare namespace App {
    * theme namespace
    */
   namespace Theme {
+    type ColorPaletteNumber = import('@sa/color-palette').ColorPaletteNumber;
+
     /**
      * color scheme
      */
@@ -36,15 +38,25 @@ declare namespace App {
       error: string;
     }
 
+    interface ThemeColor extends OtherColor {
+      primary: string;
+    }
+
+    type ThemeColorKey = keyof ThemeColor;
+
+    type ThemePaletteColor = {
+      [key in ThemeColorKey | `${ThemeColorKey}-${ColorPaletteNumber}`]: string;
+    };
+
     type BaseToken = Record<string, Record<string, string>>;
 
-    interface ThemeTokenColor extends OtherColor {
-      primary: string;
+    type ThemeTokenColor = ThemePaletteColor & {
       container: string;
       layout: string;
       base_text: string;
+    } & {
       [key: string]: string;
-    }
+    };
 
     type ThemeToken = {
       colors: ThemeTokenColor;
@@ -53,7 +65,20 @@ declare namespace App {
         sider: string;
         tab: string;
       };
+    } & { [key: string]: Record<string, string> };
+
+    interface CssVarsItem {
+      cssVarsKey: string;
+      cssValue: string;
+    }
+
+    type ThemeTokenVars = {
+      [key in keyof ThemeToken]: {
+        [k in keyof ThemeToken[key]]: CssVarsItem;
+      };
     };
+
+    type BaseTokenVars = Record<string, Record<string, CssVarsItem>>;
   }
 
   namespace Global {
