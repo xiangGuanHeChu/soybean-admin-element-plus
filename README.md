@@ -1,3 +1,3 @@
-# @sa/antd
+# @sa/elp
 
-SoybeanAdmin AntDesign
+SoybeanAdmin ElementPlus
