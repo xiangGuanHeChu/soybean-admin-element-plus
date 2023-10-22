@@ -54,7 +54,6 @@ declare namespace App {
       container: string;
       layout: string;
       base_text: string;
-    } & {
       [key: string]: string;
     };
 
@@ -65,7 +64,8 @@ declare namespace App {
         sider: string;
         tab: string;
       };
-    } & { [key: string]: Record<string, string> };
+      [key: string]: Record<string, string>;
+    };
 
     interface CssVarsItem {
       cssVarsKey: string;

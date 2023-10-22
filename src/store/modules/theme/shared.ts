@@ -1,7 +1,6 @@
 import { getColorPalette } from '@sa/color-palette';
-import { getRgbOfColor } from '@sa/utils';
+import { mixColor, getRgbOfColor } from '@sa/utils';
 import { themeVars } from '@/theme/vars';
-import { getElementPlusThemeVars } from './element-plus';
 
 const DARK_CLASS = 'dark';
 
@@ -70,86 +69,16 @@ export function createThemeToken() {
 }
 
 /**
- * create theme palette colors
- * @param colors theme colors
- */
-function createThemePaletteColors(colors: App.Theme.ThemeColor) {
-  const colorKeys = Object.keys(colors) as App.Theme.ThemeColorKey[];
-  const colorPaletteVar = {} as App.Theme.ThemePaletteColor;
-
-  colorKeys.forEach(key => {
-    const { palettes, main } = getColorPalette(colors[key], key);
-
-    colorPaletteVar[key] = main.hexcode;
-
-    palettes.forEach(item => {
-      colorPaletteVar[`${key}-${item.number}`] = item.hexcode;
-    });
-  });
-
-  return colorPaletteVar;
-}
-
-/**
- * get theme token vars
- * @param tokens
- */
-function getThemeTokenVars(tokens: App.Theme.BaseToken) {
-  const themeTokenVars = {} as App.Theme.BaseTokenVars;
-  const themeTokenVarsArray: string[] = [];
-
-  function removeVarPrefix(value: string) {
-    return value.replace('var(', '').replace(')', '');
-  }
-
-  function removeRgbPrefix(value: string) {
-    return value.replace('rgb(', '').replace(')', '');
-  }
-
-  for (const [key, tokenValues] of Object.entries(themeVars as unknown as App.Theme.BaseToken)) {
-    themeTokenVars[key] = {};
-
-    for (const [tokenKey, tokenValue] of Object.entries(tokenValues)) {
-      let cssVarsKey = removeVarPrefix(tokenValue);
-      let cssValue = tokens[key][tokenKey];
-
-      if (key === 'colors') {
-        cssVarsKey = removeRgbPrefix(cssVarsKey);
-        const { r, g, b } = getRgbOfColor(cssValue);
-        cssValue = `${r}, ${g}, ${b}`;
-      }
-
-      themeTokenVars[key][tokenKey] = {
-        cssVarsKey,
-        cssValue
-      };
-
-      themeTokenVarsArray.push(`${cssVarsKey}: ${cssValue}`);
-    }
-  }
-
-  const themeTokenVarStr = themeTokenVarsArray.join(';');
-
-  const result = {
-    themeTokenVars,
-    themeTokenVarStr
-  } as {
-    themeTokenVars: App.Theme.ThemeTokenVars;
-    themeTokenVarStr: string;
-  };
-
-  return result;
-}
-
-/**
  * add theme vars to html
  * @param tokens
  */
 export function setupThemeVarsToHtml<T extends App.Theme.BaseToken>(tokens: T, darkTokens: T) {
-  const { themeTokenVars, themeTokenVarStr: cssVarStr } = getThemeTokenVars(tokens);
-  const { themeTokenVarStr: darkCssVarStr } = getThemeTokenVars(darkTokens);
-  const elementPlusCssVarStr = getElementPlusThemeVars(themeTokenVars);
-  const elementPlusDarkCssVarStr = getElementPlusThemeVars(themeTokenVars, true);
+  const cssVarStr = getCssVarByTokens(tokens);
+  const darkCssVarStr = getCssVarByTokens(darkTokens);
+
+  const paletteColors = tokens.colors as App.Theme.ThemePaletteColor;
+  const elementPlusCssVarStr = getElementPlusThemeVars(paletteColors);
+  const elementPlusDarkCssVarStr = getElementPlusThemeVars(paletteColors, true);
 
   const css = `
     :root {
@@ -192,4 +121,133 @@ export function toggleCssDarkMode(darkMode = false) {
   } else {
     removeDarkClass();
   }
+}
+
+/**
+ * create theme palette colors
+ * @param colors theme colors
+ */
+function createThemePaletteColors(colors: App.Theme.ThemeColor) {
+  const colorKeys = Object.keys(colors) as App.Theme.ThemeColorKey[];
+  const colorPaletteVar = {} as App.Theme.ThemePaletteColor;
+
+  colorKeys.forEach(key => {
+    const { palettes, main } = getColorPalette(colors[key], key);
+
+    colorPaletteVar[key] = main.hexcode;
+
+    palettes.forEach(item => {
+      colorPaletteVar[`${key}-${item.number}`] = item.hexcode;
+    });
+  });
+
+  return colorPaletteVar;
+}
+
+/**
+ * get css var by tokens
+ * @param tokens theme base tokens
+ */
+function getCssVarByTokens(tokens: App.Theme.BaseToken) {
+  const styles: string[] = [];
+
+  function removeVarPrefix(value: string) {
+    return value.replace('var(', '').replace(')', '');
+  }
+
+  function removeRgbPrefix(value: string) {
+    return value.replace('rgb(', '').replace(')', '');
+  }
+
+  for (const [key, tokenValues] of Object.entries(themeVars)) {
+    for (const [tokenKey, tokenValue] of Object.entries(tokenValues)) {
+      let cssVarsKey = removeVarPrefix(tokenValue);
+      let cssValue = tokens[key][tokenKey];
+
+      if (key === 'colors') {
+        cssVarsKey = removeRgbPrefix(cssVarsKey);
+        const { r, g, b } = getRgbOfColor(cssValue);
+        cssValue = `${r}, ${g}, ${b}`;
+      }
+
+      styles.push(`${cssVarsKey}: ${cssValue}`);
+    }
+  }
+
+  const styleStr = styles.join(';');
+
+  return styleStr;
+}
+
+type ElementPlusThemeColor = App.Theme.ThemeColorKey | 'danger';
+
+type ElementPlusThemeColorLightNumber = 3 | 5 | 7 | 8 | 9;
+
+type GetElementThemeColorVarsKey<T extends string> =
+  | `--el-color-${T}`
+  | `--el-color-${T}-rgb`
+  | `--el-color-${T}-light-${ElementPlusThemeColorLightNumber}`
+  | `--el-color-${T}-dark-2`;
+
+type ElementPlusThemeVars<T extends ElementPlusThemeColor = ElementPlusThemeColor> = {
+  [key in GetElementThemeColorVarsKey<T>]: string;
+};
+
+function getElementPlusColorVarsByColor<T extends ElementPlusThemeColor>(
+  colorKey: T,
+  colorValue: string,
+  darkTheme = false
+) {
+  const colorSchema = darkTheme ? 'dark' : 'light';
+
+  const mixColorMap = {
+    light: {
+      lightMix: '#ffffff',
+      darkMix: '#000000'
+    },
+    dark: {
+      lightMix: '#141414',
+      darkMix: '#ffffff'
+    }
+  };
+
+  const { r, g, b } = getRgbOfColor(colorValue);
+
+  const colorVars: Partial<ElementPlusThemeVars> = {
+    [`--el-color-${colorKey}`]: colorValue,
+    [`--el-color-${colorKey}-rgb`]: `${r}, ${g}, ${b}`,
+    [`--el-color-${colorKey}-dark-2`]: mixColor(colorValue, mixColorMap[colorSchema].darkMix, 0.2)
+  };
+
+  const colorIndexes: ElementPlusThemeColorLightNumber[] = [3, 5, 7, 8, 9];
+
+  colorIndexes.forEach(index => {
+    const mColor = mixColor(colorValue, mixColorMap[colorSchema].lightMix, index / 10);
+
+    colorVars[`--el-color-${colorKey}-light-${index}`] = mColor;
+  });
+
+  return colorVars as ElementPlusThemeVars<T>;
+}
+
+function getElementPlusThemeVars(colors: App.Theme.ThemePaletteColor, darkTheme = false) {
+  const cssVars = {} as ElementPlusThemeVars;
+
+  const elementPlusColors: ElementPlusThemeColor[] = ['primary', 'info', 'success', 'warning', 'error', 'danger'];
+
+  elementPlusColors.forEach(colorKey => {
+    const key = colorKey === 'danger' ? 'error' : colorKey;
+
+    const color = colors[key];
+
+    const colorVars = getElementPlusColorVarsByColor(key, color, darkTheme);
+
+    Object.assign(cssVars, colorVars);
+  });
+
+  const cssVarStr = Object.entries(cssVars)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join(';');
+
+  return cssVarStr;
 }
