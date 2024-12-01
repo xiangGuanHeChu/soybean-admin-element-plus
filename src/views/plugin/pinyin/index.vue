@@ -29,7 +29,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <ElCard header="pinyin 插件" :bordered="false" class="h-full card-wrapper">
+    <ElCard shadow="never" header="pinyin 插件" :bordered="false" class="h-full card-wrapper">
       <ElSpace :vertical="true">
         <GithubLink link="https://github.com/zh-lx/pinyin-pro" />
         <WebSiteLink label="文档地址：" link="https://pinyin-pro.cn/" />

@@ -25,7 +25,7 @@ const statisticData = computed<StatisticData[]>(() => [
 </script>
 
 <template>
-  <ElCard shadow="hover" class="card-wrapper">
+  <ElCard shadow="never" class="card-wrapper">
     <ElRow :gutter="gap">
       <ElCol :md="18" :sm="24">
         <div class="flex-y-center">

@@ -154,6 +154,7 @@ onMounted(() => {
 <template>
   <div class="overflow-hidden lt-sm:overflow-auto">
     <ElCard
+      shadow="never"
       header="甘特图演示"
       size="small"
       content-class="overflow-y-hidden overflow-x-auto"

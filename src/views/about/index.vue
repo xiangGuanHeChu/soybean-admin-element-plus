@@ -44,10 +44,24 @@ const latestBuildTime = BUILD_TIME;
 
 <template>
   <ElSpace direction="vertical" fill :size="16">
-    <ElCard :header="$t('page.about.title')" :bordered="false" size="small" segmented class="card-wrapper">
+    <ElCard
+      shadow="never"
+      :header="$t('page.about.title')"
+      :bordered="false"
+      size="small"
+      segmented
+      class="card-wrapper"
+    >
       <p>{{ $t('page.about.introduction') }}</p>
     </ElCard>
-    <ElCard :header="$t('page.about.projectInfo.title')" :bordered="false" size="small" segmented class="card-wrapper">
+    <ElCard
+      shadow="never"
+      :header="$t('page.about.projectInfo.title')"
+      :bordered="false"
+      size="small"
+      segmented
+      class="card-wrapper"
+    >
       <ElDescriptions label-placement="left" border :column="column">
         <ElDescriptionsItem :label="$t('page.about.projectInfo.version')">
           <ElTag type="primary">{{ pkgJson.version }}</ElTag>
@@ -67,14 +81,28 @@ const latestBuildTime = BUILD_TIME;
         </ElDescriptionsItem>
       </ElDescriptions>
     </ElCard>
-    <ElCard :header="$t('page.about.prdDep')" :bordered="false" size="small" segmented class="card-wrapper">
+    <ElCard
+      shadow="never"
+      :header="$t('page.about.prdDep')"
+      :bordered="false"
+      size="small"
+      segmented
+      class="card-wrapper"
+    >
       <ElDescriptions label-placement="left" border :column="column">
         <ElDescriptionsItem v-for="item in pkgJson.dependencies" :key="item.name" :label="item.name">
           {{ item.version }}
         </ElDescriptionsItem>
       </ElDescriptions>
     </ElCard>
-    <ElCard :header="$t('page.about.devDep')" :bordered="false" size="small" segmented class="card-wrapper">
+    <ElCard
+      shadow="never"
+      :header="$t('page.about.devDep')"
+      :bordered="false"
+      size="small"
+      segmented
+      class="card-wrapper"
+    >
       <ElDescriptions label-placement="left" border :column="column">
         <ElDescriptionsItem v-for="item in pkgJson.devDependencies" :key="item.name" :label="item.name">
           {{ item.version }}

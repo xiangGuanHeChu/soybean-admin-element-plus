@@ -62,7 +62,7 @@ async function handleToggleAccount(account: Account) {
 
 <template>
   <ElSpace direction="vertical" fill :size="16">
-    <ElCard :header="$t('route.function_toggle-auth')" size="small" segmented class="card-wrapper">
+    <ElCard shadow="never" :header="$t('route.function_toggle-auth')" size="small" segmented class="card-wrapper">
       <ElDescriptions direction="vertical" border :column="1">
         <ElDescriptionsItem :label="$t('page.manage.user.userRole')">
           <ElSpace>
@@ -84,7 +84,13 @@ async function handleToggleAccount(account: Account) {
         </ElDescriptionsItem>
       </ElDescriptions>
     </ElCard>
-    <ElCard :header="$t('page.function.toggleAuth.authHook')" size="small" segmented class="card-wrapper">
+    <ElCard
+      shadow="never"
+      :header="$t('page.function.toggleAuth.authHook')"
+      size="small"
+      segmented
+      class="card-wrapper"
+    >
       <ElSpace>
         <ElButton v-if="hasAuth('B_CODE1')">{{ $t('page.function.toggleAuth.superAdminVisible') }}</ElButton>
         <ElButton v-if="hasAuth('B_CODE2')">{{ $t('page.function.toggleAuth.adminVisible') }}</ElButton>

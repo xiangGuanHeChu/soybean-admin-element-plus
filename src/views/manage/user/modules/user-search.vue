@@ -41,7 +41,7 @@ async function search() {
 </script>
 
 <template>
-  <ElCard :bordered="false" size="small" class="card-wrapper">
+  <ElCard shadow="never" :bordered="false" size="small" class="card-wrapper">
     <ElCollapse>
       <ElCollapseItem :title="$t('common.search')" name="user-search">
         <ElForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="80">
