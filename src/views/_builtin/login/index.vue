@@ -1,84 +1,84 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Component } from 'vue';
-import { getColorPalette, mixColor } from '@sa/utils';
+import { getPaletteColorByNumber, mixColor } from '@sa/color';
 import { $t } from '@/locales';
+import { useAppStore } from '@/store/modules/app';
 import { useThemeStore } from '@/store/modules/theme';
-import { loginModuleLabels } from '@/constants/app';
-import PwdLogin from './components/pwd-login.vue';
-import CodeLogin from './components/code-login.vue';
-import Register from './components/register.vue';
-import ResetPwd from './components/reset-pwd.vue';
-import BindWechat from './components/bind-wechat.vue';
+import { loginModuleRecord } from '@/constants/app';
+import PwdLogin from './modules/pwd-login.vue';
+import CodeLogin from './modules/code-login.vue';
+import Register from './modules/register.vue';
+import ResetPwd from './modules/reset-pwd.vue';
+import BindWechat from './modules/bind-wechat.vue';
+
+defineOptions({ name: 'Login' });
 
 interface Props {
-  /**
-   * the login module
-   */
+  /** The login module */
   module?: UnionKey.LoginModule;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  module: 'pwd-login'
-});
+const props = defineProps<Props>();
 
-const theme = useThemeStore();
+const appStore = useAppStore();
+const themeStore = useThemeStore();
 
 interface LoginModule {
-  key: UnionKey.LoginModule;
   label: string;
   component: Component;
 }
 
-const modules: LoginModule[] = [
-  { key: 'pwd-login', label: loginModuleLabels['pwd-login'], component: PwdLogin },
-  { key: 'code-login', label: loginModuleLabels['code-login'], component: CodeLogin },
-  { key: 'register', label: loginModuleLabels.register, component: Register },
-  { key: 'reset-pwd', label: loginModuleLabels['reset-pwd'], component: ResetPwd },
-  { key: 'bind-wechat', label: loginModuleLabels['bind-wechat'], component: BindWechat }
-];
+const moduleMap: Record<UnionKey.LoginModule, LoginModule> = {
+  'pwd-login': { label: loginModuleRecord['pwd-login'], component: PwdLogin },
+  'code-login': { label: loginModuleRecord['code-login'], component: CodeLogin },
+  register: { label: loginModuleRecord.register, component: Register },
+  'reset-pwd': { label: loginModuleRecord['reset-pwd'], component: ResetPwd },
+  'bind-wechat': { label: loginModuleRecord['bind-wechat'], component: BindWechat }
+};
 
-const activeModule = computed(() => {
-  const active: LoginModule = { ...modules[0] };
-  const findItem = modules.find(item => item.key === props.module);
-  if (findItem) {
-    Object.assign(active, findItem);
-  }
-  return active;
-});
+const activeModule = computed(() => moduleMap[props.module || 'pwd-login']);
 
-const bgThemeColor = computed(() => (theme.darkMode ? getColorPalette(theme.themeColor, 7) : theme.themeColor));
+const bgThemeColor = computed(() =>
+  themeStore.darkMode ? getPaletteColorByNumber(themeStore.themeColor, 600) : themeStore.themeColor
+);
 
 const bgColor = computed(() => {
   const COLOR_WHITE = '#ffffff';
 
-  const ratio = theme.darkMode ? 0.5 : 0.2;
+  const ratio = themeStore.darkMode ? 0.5 : 0.2;
 
-  return mixColor(COLOR_WHITE, theme.themeColor, ratio);
+  return mixColor(COLOR_WHITE, themeStore.themeColor, ratio);
 });
-
-const transitionName: UnionKey.ThemeAnimateMode = 'slide-in-left';
 </script>
 
 <template>
-  <div class="relative flex-center wh-full" :style="{ backgroundColor: bgColor }">
+  <div class="relative size-full flex-center overflow-hidden" :style="{ backgroundColor: bgColor }">
     <WaveBg :theme-color="bgThemeColor" />
-    <ElCard class="relative z-4" shadow="never">
-      <div class="w-400px <sm:w-300px">
+    <ElCard :bordered="false" class="relative z-4 w-auto rd-12px">
+      <div class="w-400px lt-sm:w-300px">
         <header class="flex-y-center justify-between">
-          <SystemLogo class="text-64px text-primary <sm:text-48px" />
-          <h3 class="text-28px font-500 text-primary <sm:text-22px">{{ $t('system.title') }}</h3>
-          <ColorSchemaSwitch
-            :color-schema="theme.colorScheme"
-            :is-dark="theme.darkMode"
-            class="text-20px <sm:text-18px"
-            @switch="theme.toggleColorScheme"
-          />
+          <SystemLogo class="text-64px text-primary lt-sm:text-48px" />
+          <h3 class="text-28px text-primary font-500 lt-sm:text-22px">{{ $t('system.title') }}</h3>
+          <div class="i-flex-col">
+            <ThemeSchemaSwitch
+              :theme-schema="themeStore.themeScheme"
+              :show-tooltip="false"
+              class="text-20px lt-sm:text-18px"
+              @switch="themeStore.toggleThemeScheme"
+            />
+            <LangSwitch
+              :lang="appStore.locale"
+              :lang-options="appStore.localeOptions"
+              :show-tooltip="false"
+              @change-lang="appStore.changeLocale"
+            />
+          </div>
         </header>
         <main class="pt-24px">
-          <h3 class="text-18px text-primary font-medium">{{ activeModule.label }}</h3>
-          <div class="pt-24px animation-slide-in-left">
-            <Transition :name="transitionName" mode="out-in" appear>
+          <h3 class="text-18px text-primary font-medium">{{ $t(activeModule.label) }}</h3>
+          <div class="pt-24px">
+            <Transition :name="themeStore.page.animateMode" mode="out-in" appear>
               <component :is="activeModule.component" />
             </Transition>
           </div>

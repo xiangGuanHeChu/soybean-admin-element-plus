@@ -1,18 +1,17 @@
-interface Window {
-  /**
-   * NProgress instance
-   */
-  NProgress?: import('nprogress').NProgress;
-}
+export {};
 
-interface ViewTransition {
-  ready: Promise<void>;
-}
+declare global {
+  export interface Window {
+    /** NProgress instance */
+    NProgress?: import('nprogress').NProgress;
+    /** MessageBox instance */
+    $messageBox?: import('element-plus').IElMessageBox;
+    /** Message instance */
+    $message?: import('element-plus').Message;
+    /** Notification instance */
+    $notification?: import('element-plus').Notify;
+  }
 
-interface Document {
-  startViewTransition?: (callback: () => Promise<void> | void) => ViewTransition;
-}
-
-interface ImportMeta {
-  readonly env: Env.ImportMeta;
+  /** Build time of the project */
+  export const BUILD_TIME: string;
 }

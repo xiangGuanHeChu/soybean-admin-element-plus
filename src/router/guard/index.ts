@@ -1,16 +1,15 @@
 import type { Router } from 'vue-router';
+import { createRouteGuard } from './route';
+import { createProgressGuard } from './progress';
+import { createDocumentTitleGuard } from './title';
 
 /**
- * 路由守卫函数
- * @param router - 路由实例
+ * Router guard
+ *
+ * @param router - Router instance
  */
 export function createRouterGuard(router: Router) {
-  router.beforeEach(async (_to, _from, next) => {
-    window.NProgress?.start?.();
-
-    next();
-  });
-  router.afterEach(_to => {
-    window.NProgress?.done?.();
-  });
+  createProgressGuard(router);
+  createRouteGuard(router);
+  createDocumentTitleGuard(router);
 }

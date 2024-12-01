@@ -1,7 +1,43 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useAppStore } from '@/store/modules/app';
+import HeaderBanner from './modules/header-banner.vue';
+import CardData from './modules/card-data.vue';
+import LineChart from './modules/line-chart.vue';
+import PieChart from './modules/pie-chart.vue';
+import ProjectNews from './modules/project-news.vue';
+import CreativityBanner from './modules/creativity-banner.vue';
+
+const appStore = useAppStore();
+
+const gap = computed(() => (appStore.isMobile ? 0 : 16));
+</script>
 
 <template>
-  <LookForward />
+  <ElSpace direction="vertical" fill :size="16">
+    <HeaderBanner />
+    <CardData />
+    <ElRow :gutter="gap">
+      <ElCol :lg="14" :sm="24">
+        <ElCard shadow="hover" class="card-wrapper">
+          <LineChart />
+        </ElCard>
+      </ElCol>
+      <ElCol :lg="10" :sm="24">
+        <ElCard shadow="hover" class="card-wrapper">
+          <PieChart />
+        </ElCard>
+      </ElCol>
+    </ElRow>
+    <ElRow :gutter="gap">
+      <ElCol :lg="14" :sm="24">
+        <ProjectNews />
+      </ElCol>
+      <ElCol :lg="10" :sm="24">
+        <CreativityBanner />
+      </ElCol>
+    </ElRow>
+  </ElSpace>
 </template>
 
 <style scoped></style>

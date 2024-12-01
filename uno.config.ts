@@ -2,7 +2,6 @@ import { defineConfig } from '@unocss/vite';
 import transformerDirectives from '@unocss/transformer-directives';
 import transformerVariantGroup from '@unocss/transformer-variant-group';
 import presetUno from '@unocss/preset-uno';
-import { presetScrollbar } from 'unocss-preset-scrollbar';
 import type { Theme } from '@unocss/preset-uno';
 import { presetSoybeanAdmin } from '@sa/uno-preset';
 import { themeVars } from './src/theme/vars';
@@ -23,6 +22,9 @@ export default defineConfig<Theme>({
       'icon-xl': '2rem'
     }
   },
+  shortcuts: {
+    'card-wrapper': 'rd-8px shadow-sm'
+  },
   transformers: [transformerDirectives(), transformerVariantGroup()],
-  presets: [presetUno({ dark: 'class' }), presetScrollbar(), presetSoybeanAdmin()]
+  presets: [presetUno({ dark: 'class' }), presetSoybeanAdmin()]
 });
