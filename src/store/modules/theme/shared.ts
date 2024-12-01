@@ -1,67 +1,68 @@
-import { getColorPalette } from '@sa/color-palette';
-import { mixColor, getRgbOfColor } from '@sa/utils';
+import { addColorAlpha, getColorPalette, getPaletteColorByNumber, getRgb } from '@sa/color';
+import { overrideThemeSettings, themeSettings } from '@/theme/settings';
 import { themeVars } from '@/theme/vars';
+import { toggleHtmlClass } from '@/utils/common';
+import { localStg } from '@/utils/storage';
 
 const DARK_CLASS = 'dark';
 
-/**
- * init theme settings
- * @param darkMode is dark mode
- */
-export function initThemeSettings(colors: App.Theme.ThemeTokenColor) {
-  const { primary: themeColor, info, success, warning, error } = colors;
+/** Init theme settings */
+export function initThemeSettings() {
+  const isProd = import.meta.env.PROD;
 
-  const themeSettings: App.Theme.ThemeSetting = {
-    colorScheme: 'light',
-    themeColor,
-    otherColor: {
-      info,
-      success,
-      warning,
-      error
-    }
-  };
+  // if it is development mode, the theme settings will not be cached, by update `themeSettings` in `src/theme/settings.ts` to update theme settings
+  if (!isProd) return themeSettings;
 
-  return themeSettings;
+  // if it is production mode, the theme settings will be cached in localStorage
+  // if want to update theme settings when publish new version, please update `overrideThemeSettings` in `src/theme/settings.ts`
+
+  const settings = localStg.get('themeSettings') || themeSettings;
+
+  const isOverride = localStg.get('overrideThemeFlag') === BUILD_TIME;
+
+  if (!isOverride) {
+    Object.assign(settings, overrideThemeSettings);
+    localStg.set('overrideThemeFlag', BUILD_TIME);
+  }
+
+  return settings;
 }
 
 /**
- * create theme token
- * @param darkMode is dark mode
+ * create theme token css vars value by theme settings
+ *
+ * @param colors Theme colors
+ * @param tokens Theme setting tokens
+ * @param [recommended=false] Use recommended color. Default is `false`
  */
-export function createThemeToken() {
-  const paletteColors = createThemePaletteColors({
-    primary: '#646cff',
-    info: '#2080f0',
-    success: '#52c41a',
-    warning: '#faad14',
-    error: '#f5222d'
-  });
+export function createThemeToken(
+  colors: App.Theme.ThemeColor,
+  tokens?: App.Theme.ThemeSetting['tokens'],
+  recommended = false
+) {
+  const paletteColors = createThemePaletteColors(colors, recommended);
 
-  const themeTokens: App.Theme.ThemeToken = {
+  const { light, dark } = tokens || themeSettings.tokens;
+
+  const themeTokens: App.Theme.ThemeTokenCSSVars = {
     colors: {
       ...paletteColors,
       nprogress: paletteColors.primary,
-      container: 'rgba(255, 255, 255, 0.8)',
-      layout: 'rgba(247, 250, 252, 1)',
-      base_text: 'rgba(0, 0, 0, 0.88)'
+      ...light.colors
     },
     boxShadow: {
-      header: '0 1px 2px rgb(0, 21, 41, 0.08)',
-      sider: '2px 0 8px 0 rgb(29, 35, 41, 0.05)',
-      tab: '0 1px 2px rgb(0, 21, 41, 0.08)'
+      ...light.boxShadow
     }
   };
 
-  const darkThemeTokens: App.Theme.ThemeToken = {
+  const darkThemeTokens: App.Theme.ThemeTokenCSSVars = {
     colors: {
       ...themeTokens.colors,
-      container: 'rgb(33, 33, 33)',
-      layout: 'rgb(18, 18, 18)',
-      base_text: 'rgba(255, 255, 255, 0.88)'
+      ...dark?.colors
     },
     boxShadow: {
-      ...themeTokens.boxShadow
+      ...themeTokens.boxShadow,
+      ...dark?.boxShadow
     }
   };
 
@@ -72,75 +73,22 @@ export function createThemeToken() {
 }
 
 /**
- * add theme vars to html
- * @param tokens
+ * Create theme palette colors
+ *
+ * @param colors Theme colors
+ * @param [recommended=false] Use recommended color. Default is `false`
  */
-export function setupThemeVarsToHtml<T extends App.Theme.BaseToken>(tokens: T, darkTokens: T) {
-  const cssVarStr = getCssVarByTokens(tokens);
-  const darkCssVarStr = getCssVarByTokens(darkTokens);
-
-  const paletteColors = tokens.colors as App.Theme.ThemePaletteColor;
-  const elementPlusCssVarStr = getElementPlusThemeVars(paletteColors);
-  const elementPlusDarkCssVarStr = getElementPlusThemeVars(paletteColors, true);
-
-  const css = `
-    :root {
-      ${elementPlusCssVarStr}
-    }
-
-    html {
-      ${cssVarStr};
-    }
-  `;
-
-  const darkCss = `
-    html.${DARK_CLASS} {
-      ${darkCssVarStr};
-      ${elementPlusDarkCssVarStr};
-    `;
-
-  const style = document.createElement('style');
-
-  style.innerText = css + darkCss;
-
-  document.head.appendChild(style);
-}
-
-/**
- * toggle css dark mode
- * @param darkMode
- */
-export function toggleCssDarkMode(darkMode = false) {
-  function addDarkClass() {
-    document.documentElement.classList.add(DARK_CLASS);
-  }
-
-  function removeDarkClass() {
-    document.documentElement.classList.remove(DARK_CLASS);
-  }
-
-  if (darkMode) {
-    addDarkClass();
-  } else {
-    removeDarkClass();
-  }
-}
-
-/**
- * create theme palette colors
- * @param colors theme colors
- */
-function createThemePaletteColors(colors: App.Theme.ThemeColor) {
+function createThemePaletteColors(colors: App.Theme.ThemeColor, recommended = false) {
   const colorKeys = Object.keys(colors) as App.Theme.ThemeColorKey[];
   const colorPaletteVar = {} as App.Theme.ThemePaletteColor;
 
   colorKeys.forEach(key => {
-    const { palettes, main } = getColorPalette(colors[key], key);
+    const colorMap = getColorPalette(colors[key], recommended);
 
-    colorPaletteVar[key] = main.hexcode;
+    colorPaletteVar[key] = colorMap.get(500)!;
 
-    palettes.forEach(item => {
-      colorPaletteVar[`${key}-${item.number}`] = item.hexcode;
+    colorMap.forEach((hex, number) => {
+      colorPaletteVar[`${key}-${number}`] = hex;
     });
   });
 
@@ -148,8 +96,9 @@ function createThemePaletteColors(colors: App.Theme.ThemeColor) {
 }
 
 /**
- * get css var by tokens
- * @param tokens theme base tokens
+ * Get css var by tokens
+ *
+ * @param tokens Theme base tokens
  */
 function getCssVarByTokens(tokens: App.Theme.BaseToken) {
   const styles: string[] = [];
@@ -169,8 +118,8 @@ function getCssVarByTokens(tokens: App.Theme.BaseToken) {
 
       if (key === 'colors') {
         cssVarsKey = removeRgbPrefix(cssVarsKey);
-        const { r, g, b } = getRgbOfColor(cssValue);
-        cssValue = `${r}, ${g}, ${b}`;
+        const { r, g, b } = getRgb(cssValue);
+        cssValue = `${r} ${g} ${b}`;
       }
 
       styles.push(`${cssVarsKey}: ${cssValue}`);
@@ -182,75 +131,117 @@ function getCssVarByTokens(tokens: App.Theme.BaseToken) {
   return styleStr;
 }
 
-type ElementPlusThemeColor = App.Theme.ThemeColorKey | 'danger';
+/**
+ * Add theme vars to global
+ *
+ * @param tokens
+ */
+export function addThemeVarsToGlobal(tokens: App.Theme.BaseToken, darkTokens: App.Theme.BaseToken) {
+  const cssVarStr = getCssVarByTokens(tokens);
+  const darkCssVarStr = getCssVarByTokens(darkTokens);
 
-type ElementPlusThemeColorLightNumber = 3 | 5 | 7 | 8 | 9;
+  const css = `:root { ${cssVarStr} }`;
 
-type GetElementThemeColorVarsKey<T extends string> =
-  | `--el-color-${T}`
-  | `--el-color-${T}-rgb`
-  | `--el-color-${T}-light-${ElementPlusThemeColorLightNumber}`
-  | `--el-color-${T}-dark-2`;
+  const darkCss = `html.${DARK_CLASS} { ${darkCssVarStr} }`;
 
-type ElementPlusThemeVars<T extends ElementPlusThemeColor = ElementPlusThemeColor> = {
-  [key in GetElementThemeColorVarsKey<T>]: string;
-};
+  const styleId = 'theme-vars';
 
-function getElementPlusColorVarsByColor<T extends ElementPlusThemeColor>(
-  colorKey: T,
-  colorValue: string,
-  darkTheme = false
-) {
-  const colorSchema = darkTheme ? 'dark' : 'light';
+  const style = document.querySelector(`#${styleId}`) || document.createElement('style');
 
-  const mixColorMap = {
-    light: {
-      lightMix: '#ffffff',
-      darkMix: '#000000'
+  style.id = styleId;
+
+  style.textContent = css + darkCss;
+
+  document.head.appendChild(style);
+}
+
+/**
+ * Toggle css dark mode
+ *
+ * @param darkMode Is dark mode
+ */
+export function toggleCssDarkMode(darkMode = false) {
+  const { add, remove } = toggleHtmlClass(DARK_CLASS);
+
+  if (darkMode) {
+    add();
+  } else {
+    remove();
+  }
+}
+
+/**
+ * Toggle auxiliary color modes
+ *
+ * @param grayscaleMode
+ * @param colourWeakness
+ */
+export function toggleAuxiliaryColorModes(grayscaleMode = false, colourWeakness = false) {
+  const htmlElement = document.documentElement;
+  htmlElement.style.filter = [grayscaleMode ? 'grayscale(100%)' : '', colourWeakness ? 'invert(80%)' : '']
+    .filter(Boolean)
+    .join(' ');
+}
+
+type NaiveColorScene = '' | 'Suppl' | 'Hover' | 'Pressed' | 'Active';
+type NaiveColorKey = `${App.Theme.ThemeColorKey}Color${NaiveColorScene}`;
+type NaiveThemeColor = Partial<Record<NaiveColorKey, string>>;
+interface NaiveColorAction {
+  scene: NaiveColorScene;
+  handler: (color: string) => string;
+}
+
+/**
+ * Get naive theme colors
+ *
+ * @param colors Theme colors
+ * @param [recommended=false] Use recommended color. Default is `false`
+ */
+function getNaiveThemeColors(colors: App.Theme.ThemeColor, recommended = false) {
+  const colorActions: NaiveColorAction[] = [
+    { scene: '', handler: color => color },
+    { scene: 'Suppl', handler: color => color },
+    { scene: 'Hover', handler: color => getPaletteColorByNumber(color, 500, recommended) },
+    { scene: 'Pressed', handler: color => getPaletteColorByNumber(color, 700, recommended) },
+    { scene: 'Active', handler: color => addColorAlpha(color, 0.1) }
+  ];
+
+  const themeColors: NaiveThemeColor = {};
+
+  const colorEntries = Object.entries(colors) as [App.Theme.ThemeColorKey, string][];
+
+  colorEntries.forEach(color => {
+    colorActions.forEach(action => {
+      const [colorType, colorValue] = color;
+      const colorKey: NaiveColorKey = `${colorType}Color${action.scene}`;
+      themeColors[colorKey] = action.handler(colorValue);
+    });
+  });
+
+  return themeColors;
+}
+
+/**
+ * Get naive theme
+ *
+ * @param colors Theme colors
+ * @param [recommended=false] Use recommended color. Default is `false`
+ */
+export function getNaiveTheme(colors: App.Theme.ThemeColor, recommended = false) {
+  const { primary: colorLoading } = colors;
+
+  const theme = {
+    common: {
+      ...getNaiveThemeColors(colors, recommended),
+      borderRadius: '6px'
     },
-    dark: {
-      lightMix: '#141414',
-      darkMix: '#ffffff'
+    LoadingBar: {
+      colorLoading
+    },
+    Tag: {
+      borderRadius: '6px'
     }
   };
 
-  const { r, g, b } = getRgbOfColor(colorValue);
-
-  const colorVars: Partial<ElementPlusThemeVars> = {
-    [`--el-color-${colorKey}`]: colorValue,
-    [`--el-color-${colorKey}-rgb`]: `${r}, ${g}, ${b}`,
-    [`--el-color-${colorKey}-dark-2`]: mixColor(colorValue, mixColorMap[colorSchema].darkMix, 0.2)
-  };
-
-  const colorIndexes: ElementPlusThemeColorLightNumber[] = [3, 5, 7, 8, 9];
-
-  colorIndexes.forEach(index => {
-    const mColor = mixColor(colorValue, mixColorMap[colorSchema].lightMix, index / 10);
-
-    colorVars[`--el-color-${colorKey}-light-${index}`] = mColor;
-  });
-
-  return colorVars as ElementPlusThemeVars<T>;
-}
-
-function getElementPlusThemeVars(colors: App.Theme.ThemePaletteColor, darkTheme = false) {
-  const cssVars = {} as ElementPlusThemeVars;
-
-  const elementPlusColors: ElementPlusThemeColor[] = ['primary', 'info', 'success', 'warning', 'error', 'danger'];
-
-  elementPlusColors.forEach(colorKey => {
-    const key = colorKey === 'danger' ? 'error' : colorKey;
-
-    const color = colors[key];
-
-    const colorVars = getElementPlusColorVarsByColor(key, color, darkTheme);
-
-    Object.assign(cssVars, colorVars);
-  });
-
-  const cssVarStr = Object.entries(cssVars)
-    .map(([key, value]) => `${key}: ${value}`)
-    .join(';');
-
-  return cssVarStr;
+  return theme;
 }

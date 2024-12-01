@@ -1,8 +1,0 @@
-@import "./reset.css";
-@import "./nprogress.css";
-
-html,
-body,
-#app {
-  height: 100%;
-}

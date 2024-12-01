@@ -3,61 +3,70 @@ import 'vue-router';
 declare module 'vue-router' {
   interface RouteMeta {
     /**
-     * title of the route
-     * @description it can be used in document title
+     * Title of the route
+     *
+     * It can be used in document title
      */
     title: string;
     /**
-     * i18n key of the route
-     * @description it's used in i18n, if it is set, the title will be ignored
+     * I18n key of the route
+     *
+     * It's used in i18n, if it is set, the title will be ignored
      */
-    i18nKey?: App.I18n.I18nKey;
+    i18nKey?: App.I18n.I18nKey | null;
     /**
-     * whether to require authentication
-     * @description need to login before entering the route
-     */
-    requiresAuth?: boolean;
-    /**
-     * roles of the route
-     * @description route can be accessed if the current user has at least one of the roles
+     * Roles of the route
+     *
+     * Route can be accessed if the current user has at least one of the roles
+     *
+     * It only works when the route mode is "static", if the route mode is "dynamic", it will be ignored
      */
     roles?: string[];
+    /** Whether to cache the route */
+    keepAlive?: boolean | undefined;
     /**
-     * is constant route
-     * @description does not need to login, and the route is defined in the frontend
+     * Is constant route
+     *
+     * when it is set to true, there will be no login verification and no permission verification to access the route
      */
-    constant?: boolean;
+    constant?: boolean | undefined;
     /**
-     * iconify icon
-     * @description it can be used in the menu or breadcrumb
+     * Iconify icon
+     *
+     * It can be used in the menu or breadcrumb
      */
     icon?: string;
     /**
-     * local icon
-     * @description in "src/assets/svg-icon", if it is set, the icon will be ignored
+     * Local icon
+     *
+     * In "src/assets/svg-icon", if it is set, the icon will be ignored
      */
     localIcon?: string;
+    /** Icon size. width and height are the same. */
+    iconFontSize?: number;
+    /** Router order */
+    order?: number | undefined;
+    /** The outer link of the route */
+    href?: string | null;
+    /** Whether to hide the route in the menu */
+    hideInMenu?: boolean | undefined;
     /**
-     * router order
+     * The menu key will be activated when entering the route
+     *
+     * The route is not in the menu
+     *
+     * @example
+     *   the route is "user_detail", if it is set to "user_list", the menu "user_list" will be activated
      */
-    order?: number;
+    activeMenu?: import('@elegant-router/types').RouteKey | undefined;
     /**
-     * whether to hide the route in the menu
+     * By default, the same route path will use one tab, even with different query, if set true, the route with
+     * different query will use different tabs
      */
-    hideInMenu?: boolean;
-    /**
-     * the menu key will be activated when entering the route
-     * @description the route is not in the menu
-     * @example the route is "user_detail", if it is set to "user_list", the menu "user_list" will be activated
-     */
-    activeMenu?: string;
-    /**
-     * by default, the same route path will use one tab, if set to true, it will use multiple tabs
-     */
-    multiTab?: boolean;
-    /**
-     * if set, the route will be fixed in tabs, and the value is the order of fixed tabs
-     */
-    fixedIndex?: number;
+    multiTab?: boolean | undefined;
+    /** If set, the route will be fixed in tabs, and the value is the order of fixed tabs */
+    fixedIndexInTab?: number | undefined;
+    /** if set query parameters, it will be automatically carried when entering the route */
+    query?: { key: string; value: string }[] | null;
   }
 }

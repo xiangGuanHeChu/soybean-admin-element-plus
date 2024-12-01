@@ -1,13 +1,14 @@
-import { toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
 import type { RouteKey } from '@elegant-router/types';
 import { router as globalRouter } from '@/router';
 
 /**
- * router push
- * @description jump to the specified route, it can replace function router.push
- * @param inSetup
+ * Router push
+ *
+ * Jump to the specified route, it can replace function router.push
+ *
+ * @param inSetup Whether is in vue script setup
  */
 export function useRouterPush(inSetup = true) {
   const router = inSetup ? useRouter() : globalRouter;
@@ -29,21 +30,39 @@ export function useRouterPush(inSetup = true) {
       name: key
     };
 
-    if (query) {
+    if (Object.keys(query || {}).length) {
       routeLocation.query = query;
     }
 
-    if (params) {
+    if (Object.keys(params || {}).length) {
       routeLocation.params = params;
     }
 
     return routerPush(routeLocation);
   }
 
+  function routerPushByKeyWithMetaQuery(key: RouteKey) {
+    const allRoutes = router.getRoutes();
+    const meta = allRoutes.find(item => item.name === key)?.meta || null;
+
+    const query: Record<string, string> = {};
+
+    meta?.query?.forEach(item => {
+      query[item.key] = item.value;
+    });
+
+    return routerPushByKey(key, { query });
+  }
+
+  async function toHome() {
+    return routerPushByKey('root');
+  }
+
   /**
-   * navigate to login page
-   * @param loginModule the login module
-   * @param redirectUrl the redirect url, if not specified, it will be the current route fullPath
+   * Navigate to login page
+   *
+   * @param loginModule The login module
+   * @param redirectUrl The redirect url, if not specified, it will be the current route fullPath
    */
   async function toLogin(loginModule?: UnionKey.LoginModule, redirectUrl?: string) {
     const module = loginModule || 'pwd-login';
@@ -64,7 +83,8 @@ export function useRouterPush(inSetup = true) {
   }
 
   /**
-   * toggle login module
+   * Toggle login module
+   *
    * @param module
    */
   async function toggleLoginModule(module: UnionKey.LoginModule) {
@@ -73,20 +93,28 @@ export function useRouterPush(inSetup = true) {
     return routerPushByKey('login', { query, params: { module } });
   }
 
+  /**
+   * Redirect from login
+   *
+   * @param [needRedirect=true] Whether to redirect after login. Default is `true`
+   */
+  async function redirectFromLogin(needRedirect = true) {
+    const redirect = route.value.query?.redirect as string;
+
+    if (needRedirect && redirect) {
+      routerPush(redirect);
+    } else {
+      toHome();
+    }
+  }
+
   return {
-    route,
     routerPush,
     routerBack,
     routerPushByKey,
+    routerPushByKeyWithMetaQuery,
     toLogin,
-    toggleLoginModule
+    toggleLoginModule,
+    redirectFromLogin
   };
-}
-
-export function useRouteQuery<T extends Record<string, string>>() {
-  const route = globalRouter.currentRoute;
-
-  const query = route.value.query as T;
-
-  return toRefs(query);
 }

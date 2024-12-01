@@ -1,47 +1,56 @@
-import { $t } from '@/locales';
-import { transformObjectToOption } from '@/utils/common';
+import { transformRecordToOption } from '@/utils/common';
 
-export const loginModuleLabels: Record<UnionKey.LoginModule, string> = {
-  'pwd-login': $t('page.login.pwdLogin.title'),
-  'code-login': $t('page.login.codeLogin.title'),
-  register: $t('page.login.register.title'),
-  'reset-pwd': $t('page.login.resetPwd.title'),
-  'bind-wechat': $t('page.login.bindWeChat.title')
+export const GLOBAL_HEADER_MENU_ID = '__GLOBAL_HEADER_MENU__';
+
+export const GLOBAL_SIDER_MENU_ID = '__GLOBAL_SIDER_MENU__';
+
+export const themeSchemaRecord: Record<UnionKey.ThemeScheme, App.I18n.I18nKey> = {
+  light: 'theme.themeSchema.light',
+  dark: 'theme.themeSchema.dark',
+  auto: 'theme.themeSchema.auto'
 };
 
-export const themeLayoutModeLabels: Record<UnionKey.ThemeLayoutMode, string> = {
-  vertical: '左侧菜单模式',
-  horizontal: '顶部菜单模式',
-  'vertical-mix': '左侧菜单混合模式',
-  'horizontal-mix': '顶部菜单混合模式'
-};
-export const themeLayoutModeOptions = transformObjectToOption(themeLayoutModeLabels);
+export const themeSchemaOptions = transformRecordToOption(themeSchemaRecord);
 
-export const themeScrollModeLabels: Record<UnionKey.ThemeScrollMode, string> = {
-  wrapper: '外层滚动',
-  content: '主体滚动'
+export const loginModuleRecord: Record<UnionKey.LoginModule, App.I18n.I18nKey> = {
+  'pwd-login': 'page.login.pwdLogin.title',
+  'code-login': 'page.login.codeLogin.title',
+  register: 'page.login.register.title',
+  'reset-pwd': 'page.login.resetPwd.title',
+  'bind-wechat': 'page.login.bindWeChat.title'
 };
-export const themeScrollModeOptions = transformObjectToOption(themeScrollModeLabels);
 
-export const themeTabModeLabels: Record<UnionKey.ThemeTabMode, string> = {
-  chrome: '谷歌风格',
-  button: '按钮风格'
+export const themeLayoutModeRecord: Record<UnionKey.ThemeLayoutMode, App.I18n.I18nKey> = {
+  vertical: 'theme.layoutMode.vertical',
+  'vertical-mix': 'theme.layoutMode.vertical-mix',
+  horizontal: 'theme.layoutMode.horizontal',
+  'horizontal-mix': 'theme.layoutMode.horizontal-mix'
 };
-export const themeTabModeOptions = transformObjectToOption(themeTabModeLabels);
 
-export const themeHorizontalMenuPositionLabels: Record<UnionKey.ThemeHorizontalMenuPosition, string> = {
-  'flex-start': '居左',
-  center: '居中',
-  'flex-end': '居右'
+export const themeLayoutModeOptions = transformRecordToOption(themeLayoutModeRecord);
+
+export const themeScrollModeRecord: Record<UnionKey.ThemeScrollMode, App.I18n.I18nKey> = {
+  wrapper: 'theme.scrollMode.wrapper',
+  content: 'theme.scrollMode.content'
 };
-export const themeHorizontalMenuPositionOptions = transformObjectToOption(themeHorizontalMenuPositionLabels);
 
-// export const themeAnimateModeLabels: Record<UnionKey.ThemeAnimateMode, string> = {
-//   'zoom-fade': '渐变',
-//   'zoom-out': '闪现',
-//   'fade-slide': '滑动',
-//   fade: '消退',
-//   'fade-bottom': '底部消退',
-//   'fade-scale': '缩放消退'
-// };
-// export const themeAnimateModeOptions = transformObjectToOption(themeAnimateModeLabels);
+export const themeScrollModeOptions = transformRecordToOption(themeScrollModeRecord);
+
+export const themeTabModeRecord: Record<UnionKey.ThemeTabMode, App.I18n.I18nKey> = {
+  chrome: 'theme.tab.mode.chrome',
+  button: 'theme.tab.mode.button'
+};
+
+export const themeTabModeOptions = transformRecordToOption(themeTabModeRecord);
+
+export const themePageAnimationModeRecord: Record<UnionKey.ThemePageAnimateMode, App.I18n.I18nKey> = {
+  'fade-slide': 'theme.page.mode.fade-slide',
+  fade: 'theme.page.mode.fade',
+  'fade-bottom': 'theme.page.mode.fade-bottom',
+  'fade-scale': 'theme.page.mode.fade-scale',
+  'zoom-fade': 'theme.page.mode.zoom-fade',
+  'zoom-out': 'theme.page.mode.zoom-out',
+  none: 'theme.page.mode.none'
+};
+
+export const themePageAnimationModeOptions = transformRecordToOption(themePageAnimationModeRecord);

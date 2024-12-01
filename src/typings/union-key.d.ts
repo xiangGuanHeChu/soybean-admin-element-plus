@@ -1,14 +1,8 @@
-/**
- * the union key namespace
- */
+/** The union key namespace */
 declare namespace UnionKey {
   /**
-   * the content-type of http request header
-   */
-  type ContentType = 'application/json' | 'application/x-www-form-urlencoded' | 'multipart/form-data';
-
-  /**
-   * the login module
+   * The login module
+   *
    * - pwd-login: password login
    * - code-login: phone code login
    * - register: register
@@ -17,41 +11,40 @@ declare namespace UnionKey {
    */
   type LoginModule = 'pwd-login' | 'code-login' | 'register' | 'reset-pwd' | 'bind-wechat';
 
+  /** Theme scheme */
+  type ThemeScheme = 'light' | 'dark' | 'auto';
+
   /**
-   * the layout mode
+   * The layout mode
+   *
    * - vertical: the vertical menu in left
    * - horizontal: the horizontal menu in top
    * - vertical-mix: two vertical mixed menus in left
-   * - horizontal-mix: the vertical menu in left and horizontal menu in top
+   * - horizontal-mix: the vertical first level menus in left and horizontal child level menus in top
    */
   type ThemeLayoutMode = 'vertical' | 'horizontal' | 'vertical-mix' | 'horizontal-mix';
 
   /**
-   * the scroll mode when content overflow
-   * - wrapper the wrapper component's root element overflow
-   * - content the content component overflow
+   * The scroll mode when content overflow
+   *
+   * - wrapper: the wrapper component's root element overflow
+   * - content: the content component overflow
    */
   type ThemeScrollMode = import('@sa/materials').LayoutScrollMode;
 
+  /** Page animate mode */
+  type ThemePageAnimateMode = 'fade' | 'fade-slide' | 'fade-bottom' | 'fade-scale' | 'zoom-fade' | 'zoom-out' | 'none';
+
   /**
-   * tab mode
+   * Tab mode
+   *
    * - chrome: chrome style
    * - button: button style
    */
   type ThemeTabMode = import('@sa/materials').PageTabMode;
 
-  /**
-   * the menu position in horizontal mode
-   * - flex-start: left position
-   * - center: center position
-   * - flex-end: right position
-   */
-  type ThemeHorizontalMenuPosition = 'flex-start' | 'center' | 'flex-end';
-
-  /**
-   * the theme animate mode
-   */
-  type ThemeAnimateMode =
+  /** Unocss animate key */
+  type UnoCssAnimateKey =
     | 'pulse'
     | 'bounce'
     | 'spin'

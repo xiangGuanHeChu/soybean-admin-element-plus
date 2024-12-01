@@ -1,18 +1,25 @@
-/**
- * the common type namespace
- */
-declare namespace Common {
-  /**
-   * the strategy action type
-   * - 0: the condition
-   * - 1: the action function, which will be called when the condition is true
-   */
-  type StrategyAction = [boolean, () => void];
+/** The common type namespace */
+declare namespace CommonType {
+  /** The strategic pattern */
+  interface StrategicPattern {
+    /** The condition */
+    condition: boolean;
+    /** If the condition is true, then call the action function */
+    callback: () => void;
+  }
 
   /**
-   * the option type
-   * @property value: the option value
-   * @property label: the option label
+   * The option type
+   *
+   * @property value: The option value
+   * @property label: The option label
    */
-  type Option<K> = { value: K; label: string };
+  type Option<K = string> = { value: K; label: string };
+
+  type YesOrNo = 'Y' | 'N';
+
+  /** add null to all properties */
+  type RecordNullable<T> = {
+    [K in keyof T]?: T[K] | undefined;
+  };
 }

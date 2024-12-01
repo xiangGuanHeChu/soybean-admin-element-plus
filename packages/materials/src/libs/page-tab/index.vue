@@ -1,26 +1,12 @@
-<template>
-  <component :is="activeTabComponent.component" :class="activeTabComponent.class" :style="cssVars" v-bind="bindProps">
-    <template #prefix>
-      <slot name="prefix"></slot>
-    </template>
-    <slot></slot>
-    <template #suffix>
-      <slot name="suffix">
-        <IconClose v-if="closable" :class="[style['icon_close']]" @click="handleClose" />
-      </slot>
-    </template>
-  </component>
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Component } from 'vue';
-import { createTabCssVars, ACTIVE_COLOR } from './shared';
+import type { PageTabMode, PageTabProps } from '../../types';
+import { ACTIVE_COLOR, createTabCssVars } from './shared';
 import ChromeTab from './chrome-tab.vue';
 import ButtonTab from './button-tab.vue';
-import IconClose from './icon-close.vue';
+import SvgClose from './svg-close.vue';
 import style from './index.module.css';
-import type { PageTabProps, PageTabMode } from '../../types';
 
 defineOptions({
   name: 'PageTab'
@@ -38,28 +24,6 @@ interface Emits {
 }
 
 const emit = defineEmits<Emits>();
-
-type SlotFn = (props?: Record<string, unknown>) => any;
-
-type Slots = {
-  /**
-   * slot
-   * @description the center content of the tab
-   */
-  default?: SlotFn;
-  /**
-   * slot
-   * @description the left content of the tab
-   */
-  prefix?: SlotFn;
-  /**
-   * slot
-   * @description the right content of the tab
-   */
-  suffix?: SlotFn;
-};
-
-defineSlots<Slots>();
 
 const activeTabComponent = computed(() => {
   const { mode, chromeClass, buttonClass } = props;
@@ -90,5 +54,19 @@ function handleClose() {
   emit('close');
 }
 </script>
+
+<template>
+  <component :is="activeTabComponent.component" :class="activeTabComponent.class" :style="cssVars" v-bind="bindProps">
+    <template #prefix>
+      <slot name="prefix"></slot>
+    </template>
+    <slot></slot>
+    <template #suffix>
+      <slot name="suffix">
+        <SvgClose v-if="closable" :class="[style['svg-close']]" @click.stop="handleClose" />
+      </slot>
+    </template>
+  </component>
+</template>
 
 <style scoped></style>
