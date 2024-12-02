@@ -83,6 +83,7 @@ $radius: 6px;
 }
 
 html .el-collapse {
+  --el-collapse-header-font-size: 16px;
   border: none;
   .el-collapse-item__header {
     border: none;
