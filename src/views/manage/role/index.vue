@@ -22,45 +22,19 @@ const {
   apiParams: {
     current: 1,
     size: 10,
-    // if you want to use the searchParams in Form, you need to define the following properties, and the value is null
-    // the value can not be undefined, otherwise the property in Form will not be reactive
     status: undefined,
     roleName: undefined,
     roleCode: undefined
   },
   columns: () => [
-    {
-      type: 'selection',
-      align: 'center',
-      width: 48
-    },
-    {
-      prop: 'index',
-      label: $t('common.index'),
-      width: 64,
-      align: 'center'
-    },
-    {
-      prop: 'roleName',
-      label: $t('page.manage.role.roleName'),
-      align: 'center',
-      minWidth: 120
-    },
-    {
-      prop: 'roleCode',
-      label: $t('page.manage.role.roleCode'),
-      align: 'center',
-      minWidth: 120
-    },
-    {
-      prop: 'roleDesc',
-      label: $t('page.manage.role.roleDesc'),
-      minWidth: 120
-    },
+    { type: 'selection', width: 48 },
+    { prop: 'index', label: $t('common.index'), width: 64 },
+    { prop: 'roleName', label: $t('page.manage.role.roleName'), minWidth: 120 },
+    { prop: 'roleCode', label: $t('page.manage.role.roleCode'), minWidth: 120 },
+    { prop: 'roleDesc', label: $t('page.manage.role.roleDesc'), minWidth: 120 },
     {
       prop: 'status',
       label: $t('page.manage.role.roleStatus'),
-      align: 'center',
       width: 100,
       formatter: row => {
         if (row.status === undefined) {
@@ -80,7 +54,6 @@ const {
     {
       prop: 'operate',
       label: $t('common.operate'),
-      align: 'center',
       width: 130,
       formatter: row => (
         <div class="flex-center gap-8px">
