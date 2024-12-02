@@ -22,27 +22,12 @@ const { columns, data, loading } = useTable({
     userEmail: undefined
   },
   columns: () => [
-    {
-      type: 'selection',
-      align: 'center',
-      width: 48
-    },
-    {
-      prop: 'index',
-      label: $t('common.index'),
-      align: 'center',
-      width: 64
-    },
-    {
-      prop: 'userName',
-      label: $t('page.manage.user.userName'),
-      align: 'center',
-      minWidth: 100
-    },
+    { type: 'selection', width: 48 },
+    { prop: 'index', label: $t('common.index'), width: 64 },
+    { prop: 'userName', label: $t('page.manage.user.userName'), minWidth: 100 },
     {
       prop: 'userGender',
       label: $t('page.manage.user.userGender'),
-      align: 'center',
       width: 100,
       formatter: row => {
         if (row.userGender === undefined) {
@@ -59,28 +44,12 @@ const { columns, data, loading } = useTable({
         return <ElTag type={tagMap[row.userGender]}>{label}</ElTag>;
       }
     },
-    {
-      prop: 'nickName',
-      label: $t('page.manage.user.nickName'),
-      align: 'center',
-      minWidth: 100
-    },
-    {
-      prop: 'userPhone',
-      label: $t('page.manage.user.userPhone'),
-      align: 'center',
-      width: 120
-    },
-    {
-      prop: 'userEmail',
-      label: $t('page.manage.user.userEmail'),
-      align: 'center',
-      minWidth: 200
-    },
+    { prop: 'nickName', label: $t('page.manage.user.nickName'), minWidth: 100 },
+    { prop: 'userPhone', label: $t('page.manage.user.userPhone'), width: 120 },
+    { prop: 'userEmail', label: $t('page.manage.user.userEmail'), minWidth: 200 },
     {
       prop: 'status',
       label: $t('page.manage.user.userStatus'),
-      align: 'center',
       width: 100,
       formatter: row => {
         if (row.status === undefined) {

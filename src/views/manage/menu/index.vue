@@ -18,12 +18,11 @@ const wrapperRef = ref<HTMLElement | null>(null);
 const { columns, columnChecks, data, loading, pagination, getData, getDataByPage } = useTable({
   apiFn: fetchGetMenuList,
   columns: () => [
-    { type: 'selection', align: 'center', width: 48 },
-    { prop: 'id', label: $t('page.manage.menu.id'), align: 'center' },
+    { type: 'selection', width: 48 },
+    { prop: 'id', label: $t('page.manage.menu.id') },
     {
       prop: 'menuType',
       label: $t('page.manage.menu.menuType'),
-      align: 'center',
       width: 90,
       formatter: row => {
         const tagMap: Record<Api.SystemManage.MenuType, UI.ThemeColor> = {
@@ -39,7 +38,6 @@ const { columns, columnChecks, data, loading, pagination, getData, getDataByPage
     {
       prop: 'menuName',
       label: $t('page.manage.menu.menuName'),
-      align: 'center',
       minWidth: 120,
       formatter: row => {
         const { i18nKey, menuName } = row;
@@ -52,7 +50,6 @@ const { columns, columnChecks, data, loading, pagination, getData, getDataByPage
     {
       prop: 'icon',
       label: $t('page.manage.menu.icon'),
-      align: 'center',
       width: 100,
       formatter: row => {
         const icon = row.iconType === '1' ? row.icon : undefined;
@@ -66,22 +63,11 @@ const { columns, columnChecks, data, loading, pagination, getData, getDataByPage
         );
       }
     },
-    {
-      prop: 'routeName',
-      label: $t('page.manage.menu.routeName'),
-      align: 'center',
-      minWidth: 120
-    },
-    {
-      prop: 'routePath',
-      label: $t('page.manage.menu.routePath'),
-      align: 'center',
-      minWidth: 120
-    },
+    { prop: 'routeName', label: $t('page.manage.menu.routeName'), minWidth: 120 },
+    { prop: 'routePath', label: $t('page.manage.menu.routePath'), minWidth: 120 },
     {
       prop: 'status',
       label: $t('page.manage.menu.menuStatus'),
-      align: 'center',
       width: 80,
       formatter: row => {
         if (row.status === undefined) {
@@ -101,7 +87,6 @@ const { columns, columnChecks, data, loading, pagination, getData, getDataByPage
     {
       prop: 'hideInMenu',
       label: $t('page.manage.menu.hideInMenu'),
-      align: 'center',
       width: 80,
       formatter: row => {
         const hide: CommonType.YesOrNo = row.hideInMenu ? 'Y' : 'N';
@@ -116,22 +101,11 @@ const { columns, columnChecks, data, loading, pagination, getData, getDataByPage
         return <ElTag type={tagMap[hide]}>{label}</ElTag>;
       }
     },
-    {
-      prop: 'parentId',
-      label: $t('page.manage.menu.parentId'),
-      width: 90,
-      align: 'center'
-    },
-    {
-      prop: 'order',
-      label: $t('page.manage.menu.order'),
-      align: 'center',
-      width: 60
-    },
+    { prop: 'parentId', label: $t('page.manage.menu.parentId'), width: 90 },
+    { prop: 'order', label: $t('page.manage.menu.order'), width: 60 },
     {
       prop: 'operate',
       label: $t('common.operate'),
-      align: 'center',
       width: 230,
       formatter: row => (
         <div class="flex-center justify-end gap-8px">
