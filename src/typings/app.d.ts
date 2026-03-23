@@ -728,7 +728,7 @@ declare namespace App {
   /** Service namespace */
   namespace Service {
     /** Other baseURL key */
-    type OtherBaseURLKey = 'demo';
+    type OtherBaseURLKey = 'demo' | 'adminUrl';
 
     interface ServiceConfigItem {
       /** The backend service base url */
@@ -760,15 +760,14 @@ declare namespace App {
       /** The backend service response data */
       data: T;
     };
-
-    /** The demo backend service response data */
-    type DemoResponse<T = unknown> = {
-      /** The backend service response code */
+    /** The admin backend service response data */
+    type adminResponse<T = unknown> = {
+      /** The backend service response status */
       status: string;
       /** The backend service response message */
-      message: string;
+      msg: string;
       /** The backend service response data */
-      result: T;
+      data: T;
     };
   }
 }

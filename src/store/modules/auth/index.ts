@@ -2,7 +2,7 @@ import { computed, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { defineStore } from 'pinia';
 import { useLoading } from '@sa/hooks';
-import { fetchGetUserInfo, fetchLogin } from '@/service/api';
+import { fetchLogin, getAdminLoginApi } from '@/service/api';
 import { useRouterPush } from '@/hooks/common/router';
 import { localStg } from '@/utils/storage';
 import { SetupStoreId } from '@/enum';
@@ -126,47 +126,67 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     endLoading();
   }
 
+  /** adminLogin
+   * @param data Login params
+   * @param [redirect=true] Whether to redirect after login. Default is `true`
+   */
+
+  async function adminLogin(data: Api.adminAuth.LoginParams, redirect = true) {
+    startLoading();
+
+    const { data: LoginResponse, error } = await getAdminLoginApi(data);
+
+    if (!error) {
+      localStg.set('adminToken', LoginResponse.token);
+      localStg.set('token', LoginResponse.token);
+      token.value = LoginResponse.token;
+
+      const copyUser: Api.Auth.UserInfo = {
+        userId: LoginResponse.user_info.id.toString(),
+        userName: LoginResponse.user_info.account,
+        roles: ['R_SUPER'],
+        buttons: ['B_CODE1', 'B_CODE2', 'B_CODE3']
+      };
+      Object.assign(userInfo, copyUser);
+      const isClear = checkTabClear();
+      let needRedirect = redirect;
+
+      if (isClear) {
+        needRedirect = false;
+      }
+      await redirectFromLogin(needRedirect);
+
+      window.$notification?.success({
+        title: $t('page.login.common.loginSuccess'),
+        message: $t('page.login.common.welcomeBack', { userName: userInfo.userName }),
+        duration: 4500
+      });
+    } else {
+      resetStore();
+    }
+    endLoading();
+  }
+
   async function loginByToken(loginToken: Api.Auth.LoginToken) {
     // 1. stored in the localStorage, the later requests need it in headers
     localStg.set('token', loginToken.token);
     localStg.set('refreshToken', loginToken.refreshToken);
 
     // 2. get user info
-    const pass = await getUserInfo();
+    // const pass = await getUserInfo();
 
-    if (pass) {
-      token.value = loginToken.token;
+    // if (pass) {
+    //   token.value = loginToken.token;
 
-      return true;
-    }
+    //   return true;
+    // }
 
-    return false;
+    return true;
   }
 
-  async function getUserInfo() {
-    const { data: info, error } = await fetchGetUserInfo();
+  // async function getUserInfo() {}
 
-    if (!error) {
-      // update store
-      Object.assign(userInfo, info);
-
-      return true;
-    }
-
-    return false;
-  }
-
-  async function initUserInfo() {
-    const hasToken = getToken();
-
-    if (hasToken) {
-      const pass = await getUserInfo();
-
-      if (!pass) {
-        resetStore();
-      }
-    }
-  }
+  async function initUserInfo() {}
 
   return {
     token,
@@ -176,6 +196,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     loginLoading,
     resetStore,
     login,
+    adminLogin,
     initUserInfo
   };
 });

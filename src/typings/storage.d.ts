@@ -14,6 +14,8 @@ declare namespace StorageType {
     lang: App.I18n.LangType;
     /** The token */
     token: string;
+    /** The admin token */
+    adminToken: string;
     /** Fixed sider with mix-menu */
     mixSiderFixed: CommonType.YesOrNo;
     /** The refresh token */
@@ -27,7 +29,7 @@ declare namespace StorageType {
     /**
      * The override theme flags
      *
-     * The value is the build time of the project
+     * The value is to build time of the project
      */
     overrideThemeFlag: string;
     /** The global tabs */

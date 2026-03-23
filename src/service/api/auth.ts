@@ -1,4 +1,4 @@
-import { request } from '../request';
+import { adminRequest, request } from '../request';
 
 /**
  * Login
@@ -14,6 +14,16 @@ export function fetchLogin(userName: string, password: string) {
       userName,
       password
     }
+  });
+}
+
+/** login */
+
+export function getAdminLoginApi(data: Api.adminAuth.LoginParams) {
+  return adminRequest<Api.adminAuth.LoginResponse>({
+    url: '/login',
+    method: 'post',
+    data
   });
 }
 
